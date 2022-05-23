@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="430.0" prefWidth="412.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.explorer.supercommander.ControllerTableView">
+    <children>
+        <TableView fx:id="tableview" onMouseClicked="#handleTableMouseClicked" prefHeight="430.0" prefWidth="412.0">
+            <columns>
+                <TableColumn fx:id="name" prefWidth="171.20001828670502" text="Name" />
+                <TableColumn fx:id="size" prefWidth="60.5999755859375" text="Size" />
+            <TableColumn fx:id="type" prefWidth="60.39996337890625" text="Type" />
+                <TableColumn fx:id="date" prefWidth="121.60003662109375" text="Date Modified" />
+            </columns>
+        </TableView>
+    </children>
+</Pane>
