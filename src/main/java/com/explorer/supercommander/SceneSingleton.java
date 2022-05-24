@@ -8,10 +8,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public final class SceneSingleton {
-    /**
-     *
-     */
-
     private static SceneSingleton INSTANCE;
     private Stage stage;
 

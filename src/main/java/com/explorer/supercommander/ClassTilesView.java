@@ -1,6 +1,5 @@
 package com.explorer.supercommander;
 
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
@@ -15,56 +14,49 @@ import java.io.IOException;
 
 
 public class ClassTilesView extends FileExplorerFx{
-    /**
-     *
-     */
 
     ClassTilesView(){}
 
     public void CreateTiles() {
-        File[] fl;
+        File[] files;
         if(CurrDirFile==null){
             CurrDirFile=new File("./");
         }
-        fl = CurrDirFile.listFiles();
+        files = CurrDirFile.listFiles();
         if(CurrDirName.equals("This PC")){
-            fl = File.listRoots();
+            files = File.listRoots();
         }
-        int len = fl.length;
 
         tilePane.getChildren().clear();
-        for(int i=0; i<len;i++){
-            Label title = new Label(fl[i].getName());
-            title.setId(fl[i].getName());
-            ImageView imageview = new ImageView(getIconImageFX(fl[i]));
+        for(File file: files){
+            Label title = new Label(file.getName());
+            title.setId(file.getName());
+            ImageView imageview = new ImageView(getIconImageFX(file));
             VBox vbox = new VBox();
-            vbox.setId(fl[i].getName());
+            vbox.setId(file.getName());
             vbox.getChildren().addAll(imageview,title);
 
-            vbox.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    if(event.getClickCount() == 2){
-                        System.out.println("Tile pressed "+vbox.getId());
-                        String str = vbox.getId();
-                        String str1 = CurrDirStr+"\\"+str;
-                        File f = new File(str1);
-                        if(f.isFile()){ Desktop d =Desktop.getDesktop();
-                            try {
-                                d.open(f);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+            vbox.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                if(event.getClickCount() == 2){
+                    System.out.println("Tile pressed "+vbox.getId());
+                    String str = vbox.getId();
+                    String str1 = CurrDirStr+"\\"+str;
+                    File f = new File(str1);
+                    if(f.isFile()){ Desktop d =Desktop.getDesktop();
+                        try {
+                            d.open(f);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                        else{
-                            CurrDirStr = str1;
-                            CurrDirFile = new File(CurrDirStr);
-                            setLabelTxt();
-                            tilePane.getChildren().clear();
-                            CreateTiles();
-                        }
-
                     }
+                    else{
+                        CurrDirStr = str1;
+                        CurrDirFile = new File(CurrDirStr);
+                        setLabelTxt();
+                        tilePane.getChildren().clear();
+                        CreateTiles();
+                    }
+
                 }
             });
 

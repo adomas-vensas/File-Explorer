@@ -1,6 +1,5 @@
 package com.explorer.supercommander;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,23 +13,18 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.control.MenuItem;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.scene.control.TextArea;
 
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.ResourceBundle;
@@ -38,51 +32,44 @@ import java.util.ResourceBundle;
 import static com.explorer.supercommander.FileExplorerFx.CurrDirStr;
 
 public class ControllerTableView implements Initializable {
-    /**
-     *
-     */
-
-//    @FXML private TableColumn<FileInfo, ImageView> image;
     @FXML private TextArea textArea;
     @FXML private Button saveBtn = new Button();
+    @FXML private Button loadBtn = new Button();
     @FXML private TableView<FileInfo> tableview = new TableView<>();
     @FXML private TableColumn<FileInfo, String> date = new TableColumn<>();
     @FXML private TableColumn<FileInfo, String> name = new TableColumn<>();
     @FXML private TableColumn<FileInfo, String> size = new TableColumn<>();
     @FXML private TableColumn<FileInfo, String> type = new TableColumn<>();
-    private Desktop desktop;
+    Desktop desktop;
     public static FileExplorerFx Fx2;
 
-    /**
-     *
-     * @param location
-     * @param resources
-     */
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Fx2 = new ClassTableView();
 
         Fx2.setValues(tableview,/*image,*/date, name, size, type);
-        if (Fx2.CurrDirFile == null) {
-            Fx2.CurrDirFile = new File("./");
-            CurrDirStr = Fx2.CurrDirFile.getAbsolutePath();
+        if (FileExplorerFx.CurrDirFile == null) {
+            FileExplorerFx.CurrDirFile = new File("./");
+            CurrDirStr = FileExplorerFx.CurrDirFile.getAbsolutePath();
         }
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
         File[] files;
         ObservableList<FileInfo> list;
-        if (Fx2.CurrDirFile == null) {
-            Fx2.CurrDirFile = new File("./");
+        if (FileExplorerFx.CurrDirFile == null) {
+            FileExplorerFx.CurrDirFile = new File("./");
         }
-        files = Fx2.CurrDirFile.listFiles();
+        files = FileExplorerFx.CurrDirFile.listFiles();
 
+        //USAGE OF COLLECTION
         LinkedList<FileInfo> arr = new LinkedList<>();
         for (File file: files) {
             String s1 = null;   //name
             String s2 = null;   //size
             String s3 = null;   //type
             String s4 = null;   //date
-//                ImageView img = null;
             try {
+                BasicFileAttributes basicFileAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
                 if (Fx2.IsDrive(file)) {
                     s1 = file.getAbsolutePath();
                 } else {
@@ -94,24 +81,22 @@ public class ControllerTableView implements Initializable {
                         s1 = temp;
                     }
 
-                    if(file.isDirectory()){
+                    if(basicFileAttributes.isDirectory()){
                         s3 = "<DIR>";
                     } else if(file.isHidden()){
                         s3 = "";
                     }
-//                    img = new ImageView(Fx2.getIconImageFX(fl[i]));
                 }
                 s2 = Fx2.calculateSize(file);
-                s4 = sdf.format(file.lastModified());
+                s4 = sdf.format(basicFileAttributes.lastModifiedTime().toMillis());
             } catch (Exception x) {
                 System.out.println("Exception detected in tableview strings: " + x.getMessage());
             }
-            arr.add(new FileInfo(/*img,*/s1, s2, s3, s4));
+            arr.add(new FileInfo(s1, s2, s3, s4));
         }
 
         list = FXCollections.observableList(arr);
 
-//      image.setCellValueFactory(new PropertyValueFactory<>("image"));
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
         date.setCellValueFactory(new PropertyValueFactory<>("date"));
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
@@ -125,19 +110,16 @@ public class ControllerTableView implements Initializable {
 
         contextMenu.getItems().addAll(edit, delete);
 
-        tableview.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if(event.isSecondaryButtonDown()) {
-                    contextMenu.show(tableview, event.getScreenX(), event.getScreenY());
-                } else {
-                    contextMenu.hide();
-                }
-
+        tableview.setOnMousePressed(event -> {
+            if(event.isSecondaryButtonDown()) {
+                contextMenu.show(tableview, event.getScreenX(), event.getScreenY());
+            } else {
+                contextMenu.hide();
             }
+
         });
 
-        edit.setOnAction(new EventHandler<ActionEvent>() {
+        edit.setOnAction(new EventHandler<>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 FileInfo selectedItem = tableview.getSelectionModel().getSelectedItem();
@@ -154,7 +136,8 @@ public class ControllerTableView implements Initializable {
 
                     String content = Files.readString(Path.of(CurrDirStr + "\\" + fileName + fileExtension));
                     contr.setTextArea(content);
-                    contr.setSaveBtn(fileName, fileExtension);
+                    contr.setSaveBtn(fileName, fileExtension, content);
+                    contr.setLoadBtn(contr);
 
                     Stage stage = new Stage();
                     stage.setTitle("Text Editor");
@@ -170,29 +153,22 @@ public class ControllerTableView implements Initializable {
 
         });
 
-        delete.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                FileInfo item = tableview.getSelectionModel().getSelectedItem();
-                String pathName = replaceSlashes(CurrDirStr);
+        delete.setOnAction(actionEvent -> {
+            FileInfo item = tableview.getSelectionModel().getSelectedItem();
+            String pathName = FileExplorerFx.replaceSlashes(CurrDirStr);
 
-                try{
-                    Files.deleteIfExists(Paths.get(pathName + item.getName() + item.getType()));
-                    tableview.getItems().remove(item);
-                    System.out.println("Deleted file: " + item.getName() + item.getType());
-                } catch(IOException e){
-                    System.out.println("File could not be deleted: " + e.getMessage());
-                }
-
+            try{
+                Files.deleteIfExists(Paths.get(pathName + item.getName() + item.getType()));
+                tableview.getItems().remove(item);
+                System.out.println("Deleted file: " + item.getName() + item.getType());
+            } catch(IOException e){
+                System.out.println("File could not be deleted: " + e.getMessage());
             }
+
         });
 
     }
 
-    /**
-     *
-     * @param mouseEvent
-     */
     @FXML
     private void handleTableMouseClicked(MouseEvent mouseEvent){
 
@@ -210,8 +186,8 @@ public class ControllerTableView implements Initializable {
             File file = new File(path);
             if(file.isDirectory() ){
                 try{
-                    Fx2.CurrDirFile = file;
-                    CurrDirStr = Fx2.CurrDirFile.getAbsolutePath();
+                    FileExplorerFx.CurrDirFile = file;
+                    CurrDirStr = FileExplorerFx.CurrDirFile.getAbsolutePath();
                     Fx2.setLabelTxt();
                     tableview.getItems().clear();
                     Fx2.CreateTableView();
@@ -230,51 +206,75 @@ public class ControllerTableView implements Initializable {
 
     }
 
-    /**
-     *
-     * @param text
-     */
     public void setTextArea(String text){
         textArea.setText(text);
     }
 
-    /**
-     *
-     * @param fileName
-     * @param fileExtension
-     */
-    public void setSaveBtn(String fileName, String fileExtension){
-        saveBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                String text = textArea.getText();
-                String pathName = replaceSlashes(CurrDirStr);
+    public void setSaveBtn(String fileName, String fileExtension, String content){
+        saveBtn.setOnAction(event -> {
+            String text = textArea.getText();
+            String pathName = FileExplorerFx.replaceSlashes(CurrDirStr);
 
-                try {
-                    FileWriter writer = new FileWriter(pathName + fileName + fileExtension, false);
-                    writer.write(text);
-                    System.out.println("Saved");
-                    writer.close();
-                } catch (IOException e) {
-                    System.out.println("Error while editing");
-                    throw new RuntimeException(e);
-                }
+            try {
+                FileWriter writer = new FileWriter(pathName + fileName + fileExtension, false);
+                writer.write(text);
+                writer.close();
+            } catch (IOException e) {
+                System.out.println("Error while editing");
+                throw new RuntimeException(e);
             }
+
+            //Save previous state to binary file
+            ObjectOutputStream output;
+            try {
+                output = new ObjectOutputStream(new FileOutputStream("savefile.ser"));
+            } catch (IOException e1) {
+                throw new RuntimeException(e1);
+            }
+
+            try {
+                output.writeObject(content);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                output.close();
+            } catch (IOException e1) {
+                throw new RuntimeException(e1);
+            }
+
+            System.out.println("Saved succesfully");
+
         });
     }
 
-    /**
-     *
-     * @param pathName
-     * @return
-     */
-    public String replaceSlashes(String pathName){
-        if(!pathName.endsWith(".")){
-            pathName += "\\";
-        } else {
-            pathName = pathName.substring(0, pathName.length() - 1);
-        }
+    public final void setLoadBtn(ControllerTableView contr){
+        loadBtn.setOnAction(actionEvent -> {
+            ObjectInputStream input;
+            try {
+                input = new ObjectInputStream(new FileInputStream("savefile.ser"));
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
 
-        return pathName;
+            try{
+                String text = (String) input.readObject();
+                contr.setTextArea(text);
+            } catch(ClassNotFoundException | IOException e){
+                e.printStackTrace();
+            }
+
+
+            try {
+                input.close();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            System.out.println("Load success");
+        });
     }
+
+
+
 }

@@ -9,17 +9,8 @@ import java.io.File;
 
 
 public class ClassTreeView extends FileExplorerFx {
-    /**
-     *
-     */
+    ClassTreeView(){}
 
-    ClassTreeView(){};
-
-    /**
-     *
-     * @param dir
-     * @return
-     */
     @Override
     public TreeItem<String>[] TreeCreate(File dir){
         TreeItem<String>[] A;
@@ -32,10 +23,10 @@ public class ClassTreeView extends FileExplorerFx {
 
             if(!file.isFile()&& !file.isHidden() && file.isDirectory()) {
                 if(n == 0){
-                    A[pos] =new TreeItem<>(file.getName()/*, new ImageView(new Image(ClassLoader.getSystemResourceAsStream("img/folderOpen.png")))*/);
+                    A[pos] =new TreeItem<>(file.getName());
                     ++pos;
                 } else {
-                    A[pos] = new TreeItem<>(file.getName()/*, new ImageView(new Image(ClassLoader.getSystemResourceAsStream("img/folderOpen.png"))))*/);
+                    A[pos] = new TreeItem<>(file.getName());
                     try{
                         A[pos].getChildren().addAll(TreeCreate(file));
                         pos++;
@@ -46,33 +37,10 @@ public class ClassTreeView extends FileExplorerFx {
             }
 //            break;
 
-//            if(!fl[i].isFile()&& !fl[i].isHidden() && fl[i].isDirectory() && n==0){
-//                A[pos] =new TreeItem<>(fl[i].getName()/*, new ImageView(new Image(ClassLoader.getSystemResourceAsStream("img/folderOpen.png")))*/);
-//                ++pos;
-//            }
-//            else if(!fl[i].isFile()&& !fl[i].isHidden() && fl[i].isDirectory() && n>0){
-//                A[pos] = new TreeItem<>(fl[i].getName()/*, new ImageView(new Image(ClassLoader.getSystemResourceAsStream("img/folderOpen.png"))))*/);
-//                try{
-//                    A[pos].getChildren().addAll(TreeCreate(fl[i]));
-//                    pos++;
-//                }catch(Exception x){
-//                    System.out.println("Exception x in treecreate at "+fl[i].getAbsolutePath()+" "+x.getMessage());
-//                }
-//            }
-
         }
-        /**Modify here*/
-        //FileComparator ov
-        /***/
         return A;
     }
 
-    /**
-     *
-     * @param item
-     * @param s
-     * @return
-     */
     @Override
     public String FindAbsolutePath(TreeItem<String> item, String s){
         if((item.getParent()==null) || (item.getParent().getValue().equals("This PC"))){
@@ -83,16 +51,15 @@ public class ClassTreeView extends FileExplorerFx {
             dir = dir+"\\"+s;
             return FindAbsolutePath(item.getParent(), dir);
         }
-        //return null;
     }
 
     @Override
     public void CreateTreeView(TreeView<String> treeview){
         File[] sysroots = File.listRoots();
-        TreeItem<String> ThisPc = new TreeItem<>("This PC"/*, new ImageView(new Image(ClassLoader.getSystemResourceAsStream("img/pc.png")))*/);
+        TreeItem<String> ThisPc = new TreeItem<>("This PC");
         TreeItem<String>[] drives = new TreeItem[sysroots.length];
         for(int i=0; i<sysroots.length;++i){
-            drives[i] = new TreeItem<>(sysroots[i].getAbsolutePath()/*, new ImageView(new Image(ClassLoader.getSystemResourceAsStream("img/thumb_Hard_Drive.png")))*/);
+            drives[i] = new TreeItem<>(sysroots[i].getAbsolutePath());
             try{
                 drives[i].getChildren().addAll(TreeCreate(sysroots[i]));
             }catch(NullPointerException x){
@@ -129,6 +96,5 @@ public class ClassTreeView extends FileExplorerFx {
 
     @Override
     public void CreateTilesView() {}
-    /****************/
 
 }

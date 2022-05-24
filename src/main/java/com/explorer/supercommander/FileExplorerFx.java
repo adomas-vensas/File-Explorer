@@ -4,24 +4,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.TilePane;
 
-//import javax.swing.*;
-//import javax.swing.filechooser.FileSystemView;
-//import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 
-//import static javafx.embed.swing.SwingFXUtils.toFXImage;
-
 public abstract class FileExplorerFx implements FileExplorer{
-    /**
-     *
-     */
 
     static File CurrDirFile;
     static String CurrDirStr;
@@ -31,18 +22,9 @@ public abstract class FileExplorerFx implements FileExplorer{
     SimpleDateFormat sdf;
 
     TableView<com.explorer.supercommander.FileInfo> tableview;
-//    TableColumn<com.explorer.supercommander.FileInfo, ImageView> image;
     TableColumn<com.explorer.supercommander.FileInfo, String> date, name, size, type;
 
     FileExplorerFx(){}
-    public Image getIconImageFX(File f){
-
-//        ImageIcon icon = (ImageIcon) FileSystemView.getFileSystemView().getSystemIcon(f);
-//        java.awt.Image img = icon.getImage();
-//        BufferedImage bimg = (BufferedImage) img;
-//        Image imgfx = toFXImage(bimg,null);
-        return null;
-    }
     public void setLabelTxt(){lbl.setText(CurrDirStr);}
     public String calculateSize(File f){
         long sizeInByte=0;
@@ -77,15 +59,18 @@ public abstract class FileExplorerFx implements FileExplorer{
                     ++count;
                 }
             } catch(Exception x){
-                System.out.println("Exception at prototype1, fileexplorer CountDir: "+x.getMessage());
+                System.out.println("Exception at prototype1, file explorer CountDir: "+x.getMessage());
             }
 
         }
         return count;
     }
     /*******************************************/
-    public int NumOfDirectChilds(File f){
-        return f.listFiles().length;
+    public int NumOfDirectChilds(File file){
+        if(file.listFiles() == null){
+            return -1;
+        }
+        return file.listFiles().length;
     }
 
     public static String formatSize(long v) {
@@ -96,4 +81,17 @@ public abstract class FileExplorerFx implements FileExplorer{
         return String.format("%.1f %sB", (double)v / (1L << (z*10)), " KMGTPE".charAt(z));
     }
 
+    public static String replaceSlashes(String pathName){
+        if(!pathName.endsWith(".")){
+            pathName += "\\";
+        } else {
+            pathName = pathName.substring(0, pathName.length() - 1);
+        }
+
+        return pathName;
+    }
+
+    public Image getIconImageFX(File f){
+        return null;
+    }
 }

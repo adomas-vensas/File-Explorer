@@ -1,14 +1,10 @@
 package com.explorer.supercommander;
 
-import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 
 import java.io.File;
@@ -20,21 +16,12 @@ import static com.explorer.supercommander.ControllerTableView.Fx2;
 import static com.explorer.supercommander.ControllerTilesView.Fx3;
 
 public class Controller implements Initializable {
-    /**
-     *
-     */
-
-    @FXML private Button btn;
     @FXML private Pane secPane;
     @FXML private TreeView<String> treeview;
     @FXML private Label label;
     private int count;
     public static ClassTreeView Fx1;
-    /**
-     *
-     * @param location
-     * @param resources
-     */
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         count = 0;
@@ -58,11 +45,6 @@ public class Controller implements Initializable {
 
     }
 
-
-    /**
-     *
-     * @param mouseEvent
-     */
     @FXML
     private void handleMouseClicked(MouseEvent mouseEvent) {
         if(mouseEvent.getClickCount() == 1){
@@ -81,18 +63,4 @@ public class Controller implements Initializable {
             }
         }
     }
-
-    /**
-     *
-     * @param event
-     * @throws IOException
-     */
-//    @FXML private void loadFxml (ActionEvent event) throws IOException {
-//        count = ( count+1 ) % 2;
-//        String setScene = (count == 0) ? "Scene2.fxml" : "Scene3.fxml";
-//        Pane newLoadedPane = FXMLLoader.load(getClass().getResource(setScene));
-//
-//        secPane.getChildren().clear();
-//        secPane.getChildren().add(newLoadedPane);
-//    }
 }

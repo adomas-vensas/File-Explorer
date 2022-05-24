@@ -13,18 +13,14 @@ import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 
 public class ClassTableView extends FileExplorerFx {
-    /**
-     *
-     */
     ClassTableView(){}
-    public void setValues(TableView<FileInfo> tableview/*,TableColumn<FileInfo, ImageView> image*/,TableColumn<FileInfo, String> date,
+    public void setValues(TableView<FileInfo> tableview,TableColumn<FileInfo, String> date,
                           TableColumn<FileInfo, String> name,TableColumn<FileInfo, String> size, TableColumn<FileInfo, String> type){
         this.tableview = tableview;
         this.date = date;
         this.name = name;
         this.size = size;
         this.type = type;
-//        this.image=image;
     }
 
 
@@ -48,11 +44,9 @@ public class ClassTableView extends FileExplorerFx {
             String s2 = null;   //size
             String s3 = null;   //type
             String s4 = null;   //date
-//            ImageView img = null;
 
             try{
                 if(IsDrive(file)){
-//                    img = new ImageView(getIconImageFX(file));
                     s1 = file.getAbsolutePath();
                 } else{
                     String temp = file.getName();
@@ -62,7 +56,6 @@ public class ClassTableView extends FileExplorerFx {
                     } else {
                         s1 = temp;
                     }
-//                    img = new ImageView(getIconImageFX(file));
                 }
                 s2 = calculateSize(file);
                 String temp = file.getName();
@@ -82,8 +75,6 @@ public class ClassTableView extends FileExplorerFx {
 
         list = FXCollections.observableList(arr);
 
-        //id.setCellValueFactory(new PropertyValueFactory<Student, Integer>("id"));
-//        image.setCellValueFactory(new PropertyValueFactory<>("image"));
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
         size.setCellValueFactory(new PropertyValueFactory<>("size"));
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
